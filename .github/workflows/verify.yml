@@ -1,0 +1,48 @@
+name: verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Runs per combination'
+        default: '1'
+  schedule:
+    # Weekly re-verification (spec §7.3) — 03:17 UTC Saturdays.
+    - cron: '17 3 * * 6'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent: [claude-code]
+        model: [deepseek]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install agent CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Dry-run check
+        run: node runner/run.js --agent ${{ matrix.agent }} --model ${{ matrix.model }} --dry-run
+
+      - name: Verify
+        if: ${{ secrets.DEEPSEEK_API_KEY != '' }}
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          IMPORT_URL: ${{ secrets.IMPORT_URL }}
+          IMPORT_TOKEN: ${{ secrets.IMPORT_TOKEN }}
+        run: node runner/run.js --agent ${{ matrix.agent }} --model ${{ matrix.model }} --runs ${{ inputs.runs || '1' }}
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runs-${{ matrix.agent }}-${{ matrix.model }}-${{ github.run_id }}
+          path: data/
+          if-no-files-found: ignore

@@ -1,0 +1,16 @@
+{
+  "name": "agentrundb-verifier",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "AgentRunDB verifier — runs AI agents against standard test cases and emits reproducible evidence.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "verify": "node runner/run.js",
+    "verify:dry": "node runner/run.js --dry-run",
+    "verify:claude-code": "node runner/run.js --agent claude-code"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "slug": "read-repo-edit-run-test",
+  "name": "Read repo \u2192 edit file \u2192 run test",
+  "task": "In this repository, the unit test for subtract() in sum.js is failing. Read the code, fix the bug so that all tests pass, and do not modify the test file.",
+  "expectedOutcome": "node --test exits 0; only sum.js (or an equivalent source file) was changed.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:read",
+    "file:edit",
+    "shell:node"
+  ]
+}
