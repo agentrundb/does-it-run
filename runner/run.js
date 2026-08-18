@@ -70,7 +70,14 @@ function changedFiles(before, after) {
 async function importRun(report, url, token) {
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
+      // Cloudflare's edge 403s bare node fetches — identify ourselves.
+      'user-agent':
+        'does-it-run/0.1 (+https://github.com/agentrundb/does-it-run)',
+      accept: 'application/json',
+    },
     body: JSON.stringify(report),
   });
   const body = await response.json().catch(() => ({}));
