@@ -23,13 +23,26 @@ export default {
     return probe.stdout.trim().replace(/^Claude Code\s+/i, '') || 'unknown';
   },
 
-  /** DeepSeek via Anthropic-compatible endpoint (verified working config). */
+  /**
+   * Anthropic-compatible endpoints — baseUrls follow each vendor's
+   * official Claude Code integration docs. Add entries as vendors ship
+   * compatible endpoints; the runner resolves `<MODEL>_API_KEY`.
+   */
   buildEnv({ model, apiKey }) {
-    if (model !== 'deepseek') {
-      throw new Error(`claude-code adapter only wires deepseek for now`);
+    const ANTHROPIC_COMPATIBLE = {
+      deepseek: 'https://api.deepseek.com',
+      kimi: 'https://api.moonshot.cn/anthropic',
+      glm: 'https://open.bigmodel.cn/api/anthropic',
+      qwen: 'https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy',
+    };
+    const baseUrl = ANTHROPIC_COMPATIBLE[model];
+    if (!baseUrl) {
+      throw new Error(
+        `claude-code adapter has no endpoint for "${model}" — supported: ${Object.keys(ANTHROPIC_COMPATIBLE).join(', ')}`
+      );
     }
     return {
-      ANTHROPIC_BASE_URL: 'https://api.deepseek.com',
+      ANTHROPIC_BASE_URL: baseUrl,
       ANTHROPIC_AUTH_TOKEN: apiKey,
     };
   },

@@ -62,7 +62,7 @@ secrets:
 
 | Secret | Purpose |
 |---|---|
-| `DEEPSEEK_API_KEY` | Model API key for the run |
+| `DEEPSEEK_API_KEY` / `KIMI_API_KEY` / `GLM_API_KEY` / `QWEN_API_KEY` | Model API key — resolved as `<MODEL>_API_KEY` (or generic `API_KEY`) |
 | `IMPORT_URL` *(optional)* | Site ingestion endpoint, e.g. `https://agentrundb.com/api/runs/import` |
 | `IMPORT_TOKEN` *(optional)* | Bearer token for the ingestion endpoint |
 

@@ -8,7 +8,8 @@
  *                       [--runs 1] [--timeout 600000] [--dry-run]
  *
  * Env:
- *   DEEPSEEK_API_KEY   model API key (required unless --dry-run)
+ *   <MODEL>_API_KEY    model API key, e.g. DEEPSEEK_API_KEY / KIMI_API_KEY /
+ *                      GLM_API_KEY / QWEN_API_KEY — or generic API_KEY
  *   IMPORT_URL         optional site ingestion endpoint
  *   IMPORT_TOKEN       optional bearer token for IMPORT_URL
  */
@@ -102,8 +103,11 @@ async function main() {
   const agentVersion = adapter.version?.() ?? '1.0.0';
   if (!options.dryRun && !options.mock) await adapter.checkInstalled();
 
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey && !options.mock) throw new Error('DEEPSEEK_API_KEY is required for live runs');
+  const keyName = `${options.model.toUpperCase().replace(/-/g, '_')}_API_KEY`;
+  const apiKey =
+    process.env[keyName] || process.env.API_KEY || process.env.DEEPSEEK_API_KEY;
+  if (!apiKey && !options.mock)
+    throw new Error(`${keyName} (or API_KEY) is required for live runs`);
   const env = options.mock ? {} : adapter.buildEnv({ model: options.model, apiKey });
 
   const outRoot = join(ROOT, 'data', options.agent);
