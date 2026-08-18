@@ -29,21 +29,33 @@ export default {
    * compatible endpoints; the runner resolves `<MODEL>_API_KEY`.
    */
   buildEnv({ model, apiKey }) {
+    // Model ids follow each vendor's Claude Code integration docs — adjust
+    // to the exact id your API plan serves if the endpoint 404s a model.
     const ANTHROPIC_COMPATIBLE = {
-      deepseek: 'https://api.deepseek.com',
-      kimi: 'https://api.moonshot.cn/anthropic',
-      glm: 'https://open.bigmodel.cn/api/anthropic',
-      qwen: 'https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy',
+      deepseek: { baseUrl: 'https://api.deepseek.com', model: 'deepseek-chat' },
+      kimi: { baseUrl: 'https://api.moonshot.cn/anthropic', model: 'kimi-k2' },
+      glm: { baseUrl: 'https://open.bigmodel.cn/api/anthropic', model: 'glm-4.6' },
+      qwen: {
+        baseUrl: 'https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy',
+        model: 'qwen3-max',
+      },
     };
-    const baseUrl = ANTHROPIC_COMPATIBLE[model];
-    if (!baseUrl) {
+    const target = ANTHROPIC_COMPATIBLE[model];
+    if (!target) {
       throw new Error(
         `claude-code adapter has no endpoint for "${model}" — supported: ${Object.keys(ANTHROPIC_COMPATIBLE).join(', ')}`
       );
     }
     return {
-      ANTHROPIC_BASE_URL: baseUrl,
+      ANTHROPIC_BASE_URL: target.baseUrl,
       ANTHROPIC_AUTH_TOKEN: apiKey,
+      // Without an explicit model the CLI asks the endpoint for its own
+      // default (claude-opus-*) → 404 on vendor endpoints.
+      ANTHROPIC_MODEL: target.model,
+      ANTHROPIC_SMALL_FAST_MODEL: target.model,
+      ANTHROPIC_DEFAULT_SONNET_MODEL: target.model,
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: target.model,
+      ANTHROPIC_DEFAULT_OPUS_MODEL: target.model,
     };
   },
 
