@@ -184,7 +184,7 @@ async function main() {
         caseSlug: options.caseSlug,
         agentVersion,
         modelVersion: options.model === 'deepseek' ? 'deepseek-chat' : options.model,
-        environment: { os: process.platform, node: process.version, verifier: 'agentrundb-verifier/0.1' },
+        environment: { os: process.platform, node: process.version, verifier: 'does-it-run/0.1' },
         status,
         durationMs,
         toolCall,

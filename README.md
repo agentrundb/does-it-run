@@ -1,7 +1,10 @@
-# AgentRunDB Verifier
+# does-it-run
 
-Runs AI agents against standard test cases and emits **reproducible evidence** —
-the fact layer behind every compatibility page on
+> **Does it actually run?**
+
+`does-it-run` executes AI agents against standard test cases and emits
+**reproducible evidence** — runs, durations, costs, diffs — the fact layer
+behind every compatibility page on
 [agentrundb.com](https://agentrundb.com).
 
 > Website content is not written. It is **run**.

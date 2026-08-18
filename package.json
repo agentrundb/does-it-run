@@ -1,9 +1,9 @@
 {
-  "name": "agentrundb-verifier",
+  "name": "does-it-run",
   "version": "0.1.0",
   "private": false,
   "type": "module",
-  "description": "AgentRunDB verifier — runs AI agents against standard test cases and emits reproducible evidence.",
+  "description": "does-it-run — run AI agents against standard test cases and publish reproducible evidence. The fact layer behind agentrundb.com.",
   "license": "MIT",
   "engines": {
     "node": ">=22"
