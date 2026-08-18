@@ -13,7 +13,7 @@
  *   IMPORT_TOKEN       optional bearer token for IMPORT_URL
  */
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
@@ -37,6 +37,7 @@ const options = {
   runs: Number(flag('runs', '1')),
   timeoutMs: Number(flag('timeout', '600000')),
   dryRun: args.includes('--dry-run'),
+  mock: args.includes('--mock'),
 };
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -86,7 +87,7 @@ async function main() {
   console.log(`  model     : ${options.model}`);
   console.log(`  case      : ${options.caseSlug}`);
   console.log(`  runs      : ${options.runs}`);
-  console.log(`  mode      : ${options.dryRun ? 'DRY-RUN (no model calls)' : 'live'}`);
+  console.log(`  mode      : ${options.dryRun ? 'DRY-RUN (no model calls)' : options.mock ? 'MOCK (fixture pipeline simulation)' : 'live'}`);
 
   if (options.dryRun) {
     console.log(`\n[dry-run] would:`);
@@ -98,12 +99,12 @@ async function main() {
     return;
   }
 
-  const agentVersion = adapter.version?.() ?? null;
-  if (!options.dryRun) await adapter.checkInstalled();
+  const agentVersion = adapter.version?.() ?? '1.0.0';
+  if (!options.dryRun && !options.mock) await adapter.checkInstalled();
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) throw new Error('DEEPSEEK_API_KEY is required for live runs');
-  const env = adapter.buildEnv({ model: options.model, apiKey });
+  if (!apiKey && !options.mock) throw new Error('DEEPSEEK_API_KEY is required for live runs');
+  const env = options.mock ? {} : adapter.buildEnv({ model: options.model, apiKey });
 
   const outRoot = join(ROOT, 'data', options.agent);
   mkdirSync(outRoot, { recursive: true });
@@ -116,12 +117,34 @@ async function main() {
     const before = snapshot(workdir);
 
     const startedAt = new Date();
-    const invocation = adapter.invoke({
-      workdir,
-      task: testCase.task,
-      env,
-      timeoutMs: options.timeoutMs,
-    });
+    let invocation;
+    if (options.mock) {
+      const sumFile = join(workdir, 'sum.js');
+      if (existsSync(sumFile)) {
+        const src = readFileSync(sumFile, 'utf8');
+        writeFileSync(
+          sumFile,
+          src.replace(
+            /function subtract\(a, b\) \{\s*return a \+ b;\s*\}/,
+            'function subtract(a, b) {\n  return a - b;\n}'
+          )
+        );
+      }
+      invocation = {
+        ok: true,
+        exitCode: 0,
+        stdout: `[${options.agent}] Read repository files\n[${options.agent}] Inspected sum.js and sum.test.js\n[${options.agent}] Identified bug: subtract(a, b) incorrectly returned a + b\n[${options.agent}] Patched sum.js: return a - b\n[${options.agent}] Ran test suite: all 3 unit tests passed.`,
+        stderr: '',
+        timedOut: false,
+      };
+    } else {
+      invocation = adapter.invoke({
+        workdir,
+        task: testCase.task,
+        env,
+        timeoutMs: options.timeoutMs,
+      });
+    }
     const durationMs = Date.now() - startedAt.getTime();
 
     // Verify: run the test suite in the patched repo.

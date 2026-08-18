@@ -1,28 +1,21 @@
 import claudeCode from './claude-code.js';
+import cline from './cline.js';
+import codex from './codex.js';
 import deepseekHarness from './deepseek-harness.js';
-
-/**
- * Adapter registry. Planned adapters are placeholders — implement
- * buildEnv/invoke to activate them (see README "Adding an agent adapter").
- */
-const planned = (slug, note) => ({
-  slug,
-  planned: true,
-  note,
-  async checkInstalled() {
-    throw new Error(`adapter "${slug}" not implemented yet — ${note}`);
-  },
-});
+import openclaw from './openclaw.js';
+import opencode from './opencode.js';
+import pi from './pi.js';
+import qwenCode from './qwen-code.js';
 
 export const adapters = {
   'claude-code': claudeCode,
+  codex,
+  opencode,
+  cline,
+  pi,
+  openclaw,
+  'qwen-code': qwenCode,
   'deepseek-harness': deepseekHarness,
-  codex: planned('codex', 'codex CLI: set model_providers.deepseek in ~/.codex/config.toml, run `codex exec`'),
-  opencode: planned('opencode', 'opencode: configure provider in opencode.json, run `opencode run`'),
-  cline: planned('cline', 'cline: VS Code extension — needs headless harness (vscode-test)'),
-  openclaw: planned('openclaw', 'openclaw: configure provider, run CLI headless'),
-  pi: planned('pi', 'pi: configure model, run CLI headless'),
-  'qwen-code': planned('qwen-code', 'qwen-code: set GEMINI_API_BASE-compatible env, run headless'),
 };
 
 export function getAdapter(slug) {

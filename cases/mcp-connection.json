@@ -1,0 +1,14 @@
+{
+  "slug": "mcp-connection",
+  "name": "MCP server registration and protocol handshake",
+  "task": "Connect to the configured MCP server, query its list of tools and resources, and invoke a basic query to verify the JSON-RPC communication channel.",
+  "expectedOutcome": "Agent successfully initializes the MCP handshake and receives valid tool/resource schema definitions without protocol errors.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "mcp:connect",
+    "mcp:tools:list"
+  ]
+}

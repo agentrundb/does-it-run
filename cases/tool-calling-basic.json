@@ -1,0 +1,15 @@
+{
+  "slug": "tool-calling-basic",
+  "name": "Multi-step tool calling (file create + parameter validation)",
+  "task": "Create a new file called 'math-utils.js' exporting a function 'factorial(n)' that computes the factorial of non-negative integers and throws on negative inputs. Then verify it by running node -e 'import(\"./math-utils.js\").then(m => console.log(m.factorial(5)))'.",
+  "expectedOutcome": "math-utils.js exists, exports factorial, correctly computes 5! = 120, and unit verification exits 0.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:create",
+    "file:write",
+    "shell:node"
+  ]
+}
