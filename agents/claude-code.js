@@ -32,7 +32,7 @@ export default {
     // Model ids follow each vendor's Claude Code integration docs — adjust
     // to the exact id your API plan serves if the endpoint 404s a model.
     const ANTHROPIC_COMPATIBLE = {
-      deepseek: { baseUrl: 'https://api.deepseek.com', model: 'deepseek-chat' },
+      deepseek: { baseUrl: 'https://api.deepseek.com/anthropic', model: 'deepseek-chat' },
       kimi: { baseUrl: 'https://api.moonshot.cn/anthropic', model: 'kimi-k2' },
       glm: { baseUrl: 'https://open.bigmodel.cn/api/anthropic', model: 'glm-4.6' },
       qwen: {
