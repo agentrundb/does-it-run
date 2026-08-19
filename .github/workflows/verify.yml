@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     # `secrets` is not allowed inside if: — gate via env (where it IS allowed).
     env:
-      HAS_MODEL_KEY: ${{ secrets.DEEPSEEK_API_KEY != '' || secrets.KIMI_API_KEY != '' || secrets.GLM_API_KEY != '' || secrets.QWEN_API_KEY != '' || secrets.API_KEY != '' }}
+      HAS_MODEL_KEY: ${{ secrets.DEEPSEEK_API_KEY != '' || secrets.KIMI_API_KEY != '' || secrets.GLM_API_KEY != '' || secrets.QWEN_API_KEY != '' || secrets.MINIMAX_API_KEY != '' || secrets.API_KEY != '' }}
     strategy:
       fail-fast: false
       matrix:
         agent: [claude-code]
-        model: [deepseek]
+        model: [deepseek, minimax]
     steps:
       - uses: actions/checkout@v5
 
@@ -41,6 +41,7 @@ jobs:
           KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           API_KEY: ${{ secrets.API_KEY }}
           IMPORT_URL: ${{ secrets.IMPORT_URL }}
           IMPORT_TOKEN: ${{ secrets.IMPORT_TOKEN }}
