@@ -1,0 +1,14 @@
+{
+  "slug": "auth-and-startup",
+  "name": "T01: Authentication & Startup Handshake",
+  "task": "Initialize agent CLI in headless mode, verify target API endpoint connection, and print version and model status.",
+  "expectedOutcome": "CLI initializes cleanly without authentication failure or SSL handshake error.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "network:api",
+    "shell:exec"
+  ]
+}

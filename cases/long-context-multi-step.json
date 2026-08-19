@@ -1,0 +1,14 @@
+{
+  "slug": "long-context-multi-step",
+  "name": "T10: Long Context & Multi-Step Workflows",
+  "task": "Perform a multi-file dependency graph analysis across 10 fixture modules and produce a unified architecture map.",
+  "expectedOutcome": "Accurate cross-module dependency summary without dropped modules or hallucinated exports.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:read",
+    "network:api"
+  ]
+}

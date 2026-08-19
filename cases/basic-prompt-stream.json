@@ -1,0 +1,13 @@
+{
+  "slug": "basic-prompt-stream",
+  "name": "T02: Basic Prompt & Streaming Response",
+  "task": "Prompt the agent with a code analysis question and verify full response streaming and reasoning_content parsing.",
+  "expectedOutcome": "Full response streamed cleanly without protocol drops or reasoning payload parse errors.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "network:api"
+  ]
+}

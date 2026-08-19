@@ -1,0 +1,13 @@
+{
+  "slug": "command-and-exec",
+  "name": "T05: Command & Test Execution",
+  "task": "Execute 'npm test' in the fixture workspace, capture the exit code and stderr, and report the test summary.",
+  "expectedOutcome": "Commands executed with correct exit code inspection and standard stream capture.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "shell:exec"
+  ]
+}

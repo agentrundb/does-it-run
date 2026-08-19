@@ -1,0 +1,14 @@
+{
+  "slug": "instruction-skill-loading",
+  "name": "T09: Project Rules & Skill Instruction Loading",
+  "task": "Read project rule file (AGENTS.md / CLAUDE.md), extract formatting conventions, and implement a utility adhering to specified conventions.",
+  "expectedOutcome": "Agent adheres to workspace-specific style rules and comment conventions.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:read",
+    "file:write"
+  ]
+}

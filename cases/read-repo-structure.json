@@ -1,0 +1,13 @@
+{
+  "slug": "read-repo-structure",
+  "name": "T03: Read Repository & Context Discovery",
+  "task": "Inspect directory trees in the fixture, locate the sum.js source file, and extract its exported symbols.",
+  "expectedOutcome": "Accurate file discovery without recursion depth issues or hallucinated paths.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:read"
+  ]
+}

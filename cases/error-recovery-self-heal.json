@@ -1,0 +1,15 @@
+{
+  "slug": "error-recovery-self-heal",
+  "name": "T07: Error Detection & Self-Healing",
+  "task": "Observe a failing test output, deduce the off-by-one bug in sum.js, patch the source, and re-run tests until green.",
+  "expectedOutcome": "Agent detects error message, repairs the source code, and verifies that tests pass without infinite loops.",
+  "fixture": "fixture",
+  "verify": {
+    "command": "node --test"
+  },
+  "requiredPermissions": [
+    "file:read",
+    "file:edit",
+    "shell:exec"
+  ]
+}
