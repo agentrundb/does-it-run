@@ -275,8 +275,9 @@ async function main() {
 
     if (process.env.IMPORT_URL && process.env.IMPORT_TOKEN) {
       const imported = await importRun(report, process.env.IMPORT_URL, process.env.IMPORT_TOKEN);
-      if (imported.status === 200) summary.imported++;
-      console.log(`  import → HTTP ${imported.status} ${JSON.stringify(imported.body?.data?.results?.[0]?.result ?? '')}`);
+      const res = imported.body?.data?.results?.[0];
+      if (imported.status === 200 && res?.result === 'created') summary.imported++;
+      console.log(`  import → HTTP ${imported.status} ${res?.result ?? ''}${res?.error ? ` (${res.error})` : ''}`);
     }
 
     rmSync(workdir, { recursive: true, force: true });
