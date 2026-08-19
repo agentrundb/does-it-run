@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { buildSanitizedEnv } from '../lib/env.js';
 
 /**
  * Qwen Code CLI adapter — Qwen coding agent CLI based on Gemini CLI.
@@ -28,9 +29,10 @@ export default {
   },
 
   invoke({ workdir, task, env, timeoutMs }) {
+    const safeEnv = buildSanitizedEnv(env);
     const result = spawnSync('qwen-code', ['-p', task, '--auto-approve'], {
       cwd: workdir,
-      env: { ...process.env, ...env },
+      env: safeEnv,
       encoding: 'utf8',
       timeout: timeoutMs,
     });

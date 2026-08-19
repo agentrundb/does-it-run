@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { buildSanitizedEnv } from '../lib/env.js';
 
 /**
  * Claude Code adapter — runs headless via `claude -p`.
@@ -25,14 +26,13 @@ export default {
 
   /**
    * Anthropic-compatible endpoints — baseUrls follow each vendor's
-   * official Claude Code integration docs. Add entries as vendors ship
-   * compatible endpoints; the runner resolves `<MODEL>_API_KEY`.
+   * official Claude Code integration docs.
    */
   buildEnv({ model, apiKey }) {
-    // Model ids follow each vendor's Claude Code integration docs — adjust
-    // to the exact id your API plan serves if the endpoint 404s a model.
     const ANTHROPIC_COMPATIBLE = {
-      deepseek: { baseUrl: 'https://api.deepseek.com/anthropic', model: 'deepseek-chat' },
+      deepseek: { baseUrl: 'https://api.deepseek.com/anthropic', model: 'deepseek-v4-pro' },
+      'deepseek-v4-pro': { baseUrl: 'https://api.deepseek.com/anthropic', model: 'deepseek-v4-pro' },
+      'deepseek-v4-flash': { baseUrl: 'https://api.deepseek.com/anthropic', model: 'deepseek-v4-flash' },
       minimax: { baseUrl: 'https://api.minimaxi.com/anthropic', model: 'MiniMax-M3' },
       kimi: { baseUrl: 'https://api.moonshot.cn/anthropic', model: 'kimi-k2' },
       glm: { baseUrl: 'https://open.bigmodel.cn/api/anthropic', model: 'glm-4.6' },
@@ -50,18 +50,17 @@ export default {
     return {
       ANTHROPIC_BASE_URL: target.baseUrl,
       ANTHROPIC_AUTH_TOKEN: apiKey,
-      // Without an explicit model the CLI asks the endpoint for its own
-      // default (claude-opus-*) → 404 on vendor endpoints.
       ANTHROPIC_MODEL: target.model,
-      ANTHROPIC_SMALL_FAST_MODEL: target.model,
+      ANTHROPIC_SMALL_FAST_MODEL: target.model === 'deepseek-v4-pro' ? 'deepseek-v4-flash' : target.model,
       ANTHROPIC_DEFAULT_SONNET_MODEL: target.model,
-      ANTHROPIC_DEFAULT_HAIKU_MODEL: target.model,
+      ANTHROPIC_DEFAULT_HAIKU_MODEL: target.model === 'deepseek-v4-pro' ? 'deepseek-v4-flash' : target.model,
       ANTHROPIC_DEFAULT_OPUS_MODEL: target.model,
     };
   },
 
-  /** Headless invocation. Returns { ok, stdout, stderr, timedOut }. */
+  /** Headless invocation with strict environment whitelisting. */
   invoke({ workdir, task, env, timeoutMs }) {
+    const safeEnv = buildSanitizedEnv(env);
     const result = spawnSync(
       'claude',
       [
@@ -70,7 +69,7 @@ export default {
         '--output-format', 'json',
         '--dangerously-skip-permissions',
       ],
-      { cwd: workdir, env: { ...process.env, ...env }, encoding: 'utf8', timeout: timeoutMs }
+      { cwd: workdir, env: safeEnv, encoding: 'utf8', timeout: timeoutMs }
     );
     return {
       ok: result.status === 0,

@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { buildSanitizedEnv } from '../lib/env.js';
 
 /**
  * Codex CLI adapter — runs headless via `codex exec`.
@@ -21,11 +22,13 @@ export default {
 
   /** Build environment overrides for the specified model. */
   buildEnv({ model, apiKey }) {
-    if (model === 'deepseek') {
+    if (model === 'deepseek' || model === 'deepseek-v4-pro' || model === 'deepseek-v4-flash') {
+      const modelId = model === 'deepseek-v4-flash' ? 'deepseek-v4-flash' : 'deepseek-v4-pro';
       return {
         OPENAI_BASE_URL: 'https://api.deepseek.com/v1',
         OPENAI_API_KEY: apiKey,
         DEEPSEEK_API_KEY: apiKey,
+        CODEX_MODEL: modelId,
       };
     }
     return {
@@ -33,7 +36,7 @@ export default {
     };
   },
 
-  /** Headless invocation. Returns { ok, stdout, stderr, timedOut, exitCode }. */
+  /** Headless invocation with strict environment whitelisting. */
   invoke({ workdir, task, env, timeoutMs }) {
     const args = [
       'exec',
@@ -41,9 +44,10 @@ export default {
       '--dangerously-bypass-approvals-and-sandbox',
     ];
 
+    const safeEnv = buildSanitizedEnv(env);
     const result = spawnSync('codex', args, {
       cwd: workdir,
-      env: { ...process.env, ...env },
+      env: safeEnv,
       encoding: 'utf8',
       timeout: timeoutMs,
     });

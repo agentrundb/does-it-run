@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { buildSanitizedEnv } from '../lib/env.js';
 
 /**
  * OpenClaw Agent adapter — open-source personal AI assistant framework.
@@ -20,8 +21,14 @@ export default {
   },
 
   buildEnv({ model, apiKey }) {
+    const modelId =
+      model === 'deepseek' || model === 'deepseek-v4-pro'
+        ? 'deepseek-v4-pro'
+        : model === 'deepseek-v4-flash'
+        ? 'deepseek-v4-flash'
+        : model;
     return {
-      OPENCLAW_MODEL: model === 'deepseek' ? 'deepseek-chat' : model,
+      OPENCLAW_MODEL: modelId,
       DEEPSEEK_API_KEY: apiKey,
       OPENAI_BASE_URL: 'https://api.deepseek.com/v1',
       OPENAI_API_KEY: apiKey,
@@ -29,9 +36,10 @@ export default {
   },
 
   invoke({ workdir, task, env, timeoutMs }) {
+    const safeEnv = buildSanitizedEnv(env);
     const result = spawnSync('openclaw', ['exec', task, '--headless'], {
       cwd: workdir,
-      env: { ...process.env, ...env },
+      env: safeEnv,
       encoding: 'utf8',
       timeout: timeoutMs,
     });

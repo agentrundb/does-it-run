@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       runs:
-        description: 'Runs per combination'
-        default: '1'
+        description: 'Runs per combination (default: 3 for statistical confidence)'
+        default: '3'
   schedule:
     # Weekly re-verification (spec §7.3) — 03:17 UTC Saturdays.
     - cron: '17 3 * * 6'
@@ -13,9 +13,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    # `secrets` is not allowed inside if: — gate via env (where it IS allowed).
     env:
-      HAS_MODEL_KEY: ${{ secrets.DEEPSEEK_API_KEY != '' || secrets.KIMI_API_KEY != '' || secrets.GLM_API_KEY != '' || secrets.QWEN_API_KEY != '' || secrets.MINIMAX_API_KEY != '' || secrets.API_KEY != '' }}
+      HAS_MODEL_KEY: ${{ secrets.DEEPSEEK_API_KEY != '' || secrets.KIMI_API_KEY != '' || secrets.GLM_API_KEY != '' || secrets.QWEN_API_KEY != '' || secrets.MINIMAX_API_KEY != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -34,18 +33,17 @@ jobs:
       - name: Dry-run check
         run: node runner/run.js --agent ${{ matrix.agent }} --model ${{ matrix.model }} --dry-run
 
-      - name: Verify
+      - name: Verify (Statistical N>=3 with Whitelisted Sandbox)
         if: env.HAS_MODEL_KEY == 'true'
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
-          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-          API_KEY: ${{ secrets.API_KEY }}
           IMPORT_URL: ${{ secrets.IMPORT_URL }}
           IMPORT_TOKEN: ${{ secrets.IMPORT_TOKEN }}
-        run: node runner/run.js --agent ${{ matrix.agent }} --model ${{ matrix.model }} --runs ${{ inputs.runs || '1' }}
+        run: node runner/run.js --agent ${{ matrix.agent }} --model ${{ matrix.model }} --runs ${{ inputs.runs || '3' }}
 
       - name: Upload evidence
         if: always()
